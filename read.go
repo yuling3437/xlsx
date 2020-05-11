@@ -23,7 +23,7 @@ type XLSXUnmarshaler interface {
 //to struct. This code expects a tag xlsx:"N", where N is the index
 //of the cell to be used. Basic types like int,string,float64 and bool
 //are supported
-func (r *Row) ReadStruct(ptr interface{}) error {
+func (r *Row) ReadStruct(ptr interface{}, offset ...int) error {
 	if ptr == nil {
 		return errNilInterface
 	}
@@ -67,7 +67,10 @@ func (r *Row) ReadStruct(ptr interface{}) error {
 			if isTime {
 				break
 			}
-			err := r.ReadStruct(structPtr)
+			//read offset
+			offsetpos,  _ := strconv.Atoi(idx)
+			
+			err := r.ReadStruct(structPtr, offsetpos)
 			if err != nil {
 				return err
 			}
@@ -78,6 +81,9 @@ func (r *Row) ReadStruct(ptr interface{}) error {
 		pos, err := strconv.Atoi(idx)
 		if err != nil {
 			return errInvalidTag
+		}
+		if len(offset) > 0 {
+			pos += offset[0]
 		}
 
 		cell := r.GetCell(pos)
