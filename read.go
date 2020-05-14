@@ -68,9 +68,15 @@ func (r *Row) ReadStruct(ptr interface{}, offset ...int) error {
 				break
 			}
 			//read offset
-			offsetpos,  _ := strconv.Atoi(idx)
-			
-			err := r.ReadStruct(structPtr, offsetpos)
+			var err error
+
+			if len(idx) == 0 {
+				err = r.ReadStruct(structPtr)
+			} else {
+				offsetpos, _ := strconv.Atoi(idx)
+				err = r.ReadStruct(structPtr, offsetpos)
+			}
+
 			if err != nil {
 				return err
 			}
